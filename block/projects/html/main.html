@@ -81,26 +81,5 @@
 
 </div>
 
-<script>
-async function connectWallet() {
-  if (typeof window.ethereum !== "undefined") {
-    try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const account = accounts[0];
-      alert("✅ Wallet connected: " + account);
-
-      // Hiển thị tên ví trên navbar
-      document.getElementById("connectWalletBtn").textContent = account.substring(0,6) + "..." + account.slice(-4);
-    } catch (err) {
-      alert("❌ Kết nối ví thất bại: " + err.message);
-    }
-  } else {
-    alert("⚠️ Vui lòng cài MetaMask hoặc ví Ethereum!");
-  }
-}
-
-document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
-</script>
-
 </body>
 </html>
