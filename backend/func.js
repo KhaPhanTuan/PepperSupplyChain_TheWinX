@@ -1,148 +1,275 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import { ethers } from "ethers";
-import contractArtifact from "./PepperSupplyChain.json" assert { type: "json" };
+const { ethers } = require("ethers");
+const { createClient } = require("@supabase/supabase-js");
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+// Load ABI từ thư mục artifacts của Hardhat
+const contractArtifact = require("../artifacts/contracts/PepperSupplyChain.sol/PepperSupplyChain.json");
 
-dotenv.config();
+// =====================================================================
+// 1. CẤU HÌNH KẾT NỐI
+// =====================================================================
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Kết nối blockchain
+// Blockchain (Ethers.js)
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 const contract = new ethers.Contract(
-  process.env.CONTRACT_ADDRESS,
-  contractArtifact.abi,
-  wallet
+    process.env.CONTRACT_ADDRESS,
+    contractArtifact.abi,
+    wallet
 );
 
-// ================== Certification Authority ==================
-app.post("/certify", async (req, res) => {
-  try {
-    const { farmId, certHash, validUntil } = req.body;
-    const tx = await contract.certifyFarm(farmId, certHash, validUntil);
-    await tx.wait();
-    res.json({ success: true, txHash: tx.hash });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
+// Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY; // Nên dùng Service Role Key cho Backend để có toàn quyền ghi DB
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-app.post("/update-cert", async (req, res) => {
-  try {
-    const { farmId, newHash, newValid } = req.body;
-    const tx = await contract.updateFarmCertification(farmId, newHash, newValid);
-    await tx.wait();
-    res.json({ success: true, txHash: tx.hash });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
+// =====================================================================
+// 2. CÁC HÀM XỬ LÝ NGHIỆP VỤ (EXPORTS)
+// =====================================================================
 
-app.get("/farm/:id", async (req, res) => {
-  try {
-    const farm = await contract.farms(req.params.id);
-    res.json(farm);
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
+/**
+ * TẠO LÔ HÀNG (Create Lot)
+ */
+async function createLot(id, chainFarmId, weight, farmerWallet) {
+    try {
+        // 1. Tìm UUID của farmer và farm
+        const { data: user, error: userErr } = await supabase
+            .from('users')
+            .select('user_id')
+            .eq('wallet_address', farmerWallet)
+            .single();
 
-// ================== Role Management ==================
-app.post("/role/farmer", async (req, res) => {
-  try { const tx = await contract.grantFarmer(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.post("/role/distributor", async (req, res) => {
-  try { const tx = await contract.grantDistributor(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.post("/role/processor", async (req, res) => {
-  try { const tx = await contract.grantProcessor(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.post("/role/retailer", async (req, res) => {
-  try { const tx = await contract.grantRetailer(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.post("/role/certifier", async (req, res) => {
-  try { const tx = await contract.grantCertifier(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        const { data: farm, error: farmErr } = await supabase
+            .from('farms')
+            .select('farm_id')
+            .eq('chain_farm_id', chainFarmId)
+            .single();
 
-// Revoke role
-app.post("/role/revoke/farmer", async (req, res) => { try { const tx = await contract.revokeFarmer(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); } catch (err) { res.status(500).json({ error: err.message }); } });
-app.post("/role/revoke/distributor", async (req, res) => { try { const tx = await contract.revokeDistributor(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); } catch (err) { res.status(500).json({ error: err.message }); } });
-app.post("/role/revoke/processor", async (req, res) => { try { const tx = await contract.revokeProcessor(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); } catch (err) { res.status(500).json({ error: err.message }); } });
-app.post("/role/revoke/retailer", async (req, res) => { try { const tx = await contract.revokeRetailer(req.body.address); await tx.wait(); res.json({ success: true, txHash: tx.hash }); } catch (err) { res.status(500).json({ error: err.message }); } });
+        if (userErr || farmErr || !user || !farm) {
+            throw new Error("Không tìm thấy Nông dân hoặc Nông trại trong Supabase");
+        }
 
-// ================== Lot Management ==================
-app.post("/lot", async (req, res) => {
-  try {
-    const { id, farmId, weight } = req.body;
-    const tx = await contract.createLot(id, farmId, weight);
-    await tx.wait();
-    res.json({ success: true, txHash: tx.hash });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
+        // 2. GỌI SMART CONTRACT
+        const tx = await contract.createLot(id, chainFarmId, weight);
+        await tx.wait(); // Đợi block được đào
 
-app.get("/lot/:id", async (req, res) => {
-  try { const lot = await contract.getLot(req.params.id); res.json(lot); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        // 3. LƯU VÀO DATABASE SUPABASE
+        // A. Insert vào bảng batches
+        const { data: newBatch, error: batchErr } = await supabase
+            .from('batches')
+            .insert([{
+                chain_batch_id: id.toString(),
+                farm_id: farm.farm_id,
+                farmer_id: user.user_id,
+                owner_id: user.user_id,
+                initial_weight: weight,
+                status: 'Created'
+            }])
+            .select('batch_id')
+            .single();
 
-app.post("/lot/:id/set-price", async (req, res) => {
-  try { const tx = await contract.setPrice(req.params.id, req.body.price); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        if (batchErr) throw batchErr;
 
-app.post("/lot/:id/process", async (req, res) => {
-  try { const tx = await contract.processLot(req.params.id, req.body.processedWeight); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        // B. Insert vào bảng batch_history
+        const { error: historyErr } = await supabase
+            .from('batch_history')
+            .insert([{
+                batch_id: newBatch.batch_id,
+                new_status: 'Created',
+                action_type: 'CREATE',
+                updated_by: user.user_id,
+                tx_hash: tx.hash
+            }]);
 
-app.post("/lot/:id/ship", async (req, res) => {
-  try { const tx = await contract.markShipped(req.params.id); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        if (historyErr) throw historyErr;
 
-app.post("/lot/:id/sell", async (req, res) => {
-  try { const tx = await contract.markSold(req.params.id); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        return { success: true, txHash: tx.hash };
+    } catch (error) {
+        console.error("Lỗi createLot:", error);
+        throw error;
+    }
+}
 
-app.post("/lot/:id/flag", async (req, res) => {
-  try { const tx = await contract.flagLot(req.params.id); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+/**
+ * GỘP LÔ HÀNG (Merge Lots)
+ */
+async function mergeLots(newId, sourceIds, processorWallet) {
+    try {
+        // 1. Tìm UUID của processor
+        const { data: user, error: userErr } = await supabase
+            .from('users')
+            .select('user_id')
+            .eq('wallet_address', processorWallet)
+            .single();
+        
+        if (userErr || !user) throw new Error("Không tìm thấy Processor trong DB");
 
-app.post("/lot/:id/recall", async (req, res) => {
-  try { const tx = await contract.recallLot(req.params.id); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        // 2. GỌI SMART CONTRACT
+        const tx = await contract.mergeLots(newId, sourceIds);
+        await tx.wait();
 
-app.post("/lot/:id/refund", async (req, res) => {
-  try { const tx = await contract.refundEscrow(req.params.id); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        // Đọc lại tổng cân nặng từ contract
+        const newLotData = await contract.getLot(newId);
+        const totalWeight = Number(newLotData.initialWeight);
 
-app.post("/lot/:id/confirm", async (req, res) => {
-  try { const tx = await contract.confirmReceived(req.params.id); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        // 3. LƯU DATABASE SUPABASE
+        // A. Insert bảng batches
+        const { data: newBatch, error: batchErr } = await supabase
+            .from('batches')
+            .insert([{
+                chain_batch_id: newId.toString(),
+                farmer_id: user.user_id,
+                owner_id: user.user_id,
+                initial_weight: totalWeight,
+                status: 'Processed'
+            }])
+            .select('batch_id')
+            .single();
 
-app.post("/lot/merge", async (req, res) => {
-  try { const tx = await contract.mergeLots(req.body.newId, req.body.source); await tx.wait(); res.json({ success: true, txHash: tx.hash }); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
+        if (batchErr) throw batchErr;
 
-// ================== Lot Purchase ==================
-app.post("/lot/:id/buy", async (req, res) => {
-  try {
-    const tx = await contract.buyLot(req.params.id, { value: req.body.value });
-    await tx.wait();
-    res.json({ success: true, txHash: tx.hash });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
+        // B. Lấy danh sách UUID của các lô nguồn từ Supabase
+        const { data: sourceBatches, error: srcErr } = await supabase
+            .from('batches')
+            .select('batch_id')
+            .in('chain_batch_id', sourceIds.map(String));
 
-// ================== Server ==================
-app.listen(3000, () => {
-  console.log("Backend running on http://localhost:3000");
-});
+        if (srcErr) throw srcErr;
+
+        // C. Insert mảng vào Junction Table (batch_sources)
+        const sourcesData = sourceBatches.map(src => ({
+            merged_batch_id: newBatch.batch_id,
+            source_batch_id: src.batch_id
+        }));
+
+        const { error: mergeErr } = await supabase
+            .from('batch_sources')
+            .insert(sourcesData);
+
+        if (mergeErr) throw mergeErr;
+
+        // D. Insert History
+        const { error: historyErr } = await supabase
+            .from('batch_history')
+            .insert([{
+                batch_id: newBatch.batch_id,
+                new_status: 'Processed',
+                action_type: 'MERGE',
+                updated_by: user.user_id,
+                tx_hash: tx.hash
+            }]);
+
+        if (historyErr) throw historyErr;
+
+        return { success: true, txHash: tx.hash };
+    } catch (error) {
+        console.error("Lỗi mergeLots:", error);
+        throw error;
+    }
+}
+
+/**
+ * MUA LÔ HÀNG (Buy Lot)
+ */
+async function buyLot(chainId, buyerWallet, ethValue) {
+    try {
+        // 1. GỌI SMART CONTRACT (Gửi kèm Wei)
+        const tx = await contract.buyLot(chainId, { value: ethers.parseEther(ethValue.toString()) });
+        await tx.wait();
+
+        // 2. TÌM DỮ LIỆU ĐỂ CẬP NHẬT DB
+        const { data: buyer, error: buyerErr } = await supabase
+            .from('users')
+            .select('user_id')
+            .eq('wallet_address', buyerWallet)
+            .single();
+
+        const { data: batch, error: batchErr } = await supabase
+            .from('batches')
+            .select('batch_id, owner_id')
+            .eq('chain_batch_id', chainId.toString())
+            .single();
+
+        if (buyerErr || batchErr || !buyer || !batch) {
+             throw new Error("Lỗi truy xuất dữ liệu User hoặc Batch để mua hàng.");
+        }
+
+        // 3. LƯU DATABASE
+        // A. Đổi owner trong batches
+        const { error: updateErr } = await supabase
+            .from('batches')
+            .update({ owner_id: buyer.user_id })
+            .eq('batch_id', batch.batch_id);
+
+        if (updateErr) throw updateErr;
+
+        // B. Lưu vào bảng transactions
+        const { error: txErr } = await supabase
+            .from('transactions')
+            .insert([{
+                batch_id: batch.batch_id,
+                from_user: batch.owner_id, // Chủ cũ
+                to_user: buyer.user_id,    // Chủ mới
+                amount: ethValue,
+                tx_hash: tx.hash
+            }]);
+
+        if (txErr) throw txErr;
+
+        // C. Lưu history
+        const { error: historyErr } = await supabase
+            .from('batch_history')
+            .insert([{
+                batch_id: batch.batch_id,
+                action_type: 'BUY',
+                updated_by: buyer.user_id,
+                tx_hash: tx.hash
+            }]);
+
+        if (historyErr) throw historyErr;
+
+        return { success: true, txHash: tx.hash };
+    } catch (error) {
+        console.error("Lỗi buyLot:", error);
+        throw error;
+    }
+}
+
+module.exports = {
+    createLot,
+    mergeLots,
+    buyLot
+};
+
+
+// ==========================================
+// HÀM TEST KẾT NỐI 2 CHIỀU (BLOCKCHAIN & SUPABASE)
+// ==========================================
+async function testFullConnection() {
+    console.log("⏳ Đang kiểm tra kết nối cả 2 đầu...");
+
+    try {
+        // 1. TEST BLOCKCHAIN: Gọi hàm lấy địa chỉ admin từ Smart Contract
+        // Lưu ý: Đảm bảo mạng Hardhat (npx hardhat node) đang chạy
+        console.log("👉 Đang gọi Smart Contract...");
+        const adminAddress = await contract.admin();
+        console.log("✅ KẾT NỐI BLOCKCHAIN THÀNH CÔNG! Địa chỉ Admin hợp đồng là:", adminAddress);
+
+        // 2. TEST DATABASE: Lấy thử 1 dòng từ bảng 'users'
+        console.log("👉 Đang gọi Supabase...");
+        const { data, error } = await supabase.from('users').select('*').limit(1);
+        
+        if (error) {
+            throw new Error("Lỗi Supabase: " + error.message);
+        }
+        console.log("✅ KẾT NỐI DATABASE THÀNH CÔNG!");
+        
+        console.log("🎉 XUẤT SẮC! Backend của bạn đã thông suốt cả 2 đường phố!");
+
+    } catch (error) {
+        console.error("❌ CÓ LỖI XẢY RA Đứt cáp ở đâu đó rồi:", error.message);
+    }
+}
+
+// Chạy hàm test
+testFullConnection();
