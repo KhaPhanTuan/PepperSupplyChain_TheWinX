@@ -2,13 +2,13 @@
 
 let currentAccount = null;
 
-// ==================== DANH SÁCH ĐỊA CHỈ VÍ ====================
+// ==================== DANH SÁCH ĐỊA CHỈ VÍ (NHẬP BÌNH THƯỜNG CŨNG ĐƯỢC) ====================
 const roleMap = {
-  "0x3A531AaeDb565e49eDb69268d8a1174930820cb4": "admin",
-  "0x9D378bb6943291E4e04339F34A5090eeDD636623": "manager",
-  "0x99F9d30B5A338c74A024EAA3AdA1EC2dfFF53e6B": "staff",
-  "0xb2a13111DB1b55435963b717d725FE46587B30EB": "user",
-  "0x9a0fF88Ca83e402f6501bAc3be7a45901e5B3603": "guest",
+  "0x2Da7b42deEd538d00D9139fa9b4498E9b50CB533": "farmer",
+  "0x355946B10DCbb7d6090fe7d1aDFCcD7929CDf418": "processor",
+  "0xA49AF12E2858AB54dc25E4fFFFfC08942F7094F6": "distributor",
+  "0x331e2eC5b5D638ccA5Ad3eE6E2FA2885cAF2da8e": "certifier",
+  "0x373e45b298b8b80d74469E981b7880171A14C5cb": "retailer",
 };
 
 // Chuyển toàn bộ roleMap về chữ thường khi khởi động
@@ -40,20 +40,20 @@ async function connectWallet() {
 
     // Chuyển hướng theo role
     switch (role) {
-      case "admin":
-        window.location.href = "admin.html";
+      case "farmer":
+        window.location.href = "farm_01.html";
         break;
-      case "manager":
-        window.location.href = "manager.html";
+      case "processor":
+        window.location.href = "process_01.html";
         break;
-      case "staff":
-        window.location.href = "staff.html";
+      case "distributor":
+        window.location.href = "distribution.html";
         break;
-      case "user":
-        window.location.href = "user.html";
+      case "certifier":
+        window.location.href = "cert_01.html";
         break;
-      case "guest":
-        window.location.href = "guest.html";
+      case "retailer":
+        window.location.href = "retail.html";
         break;
       default:
         alert(`Tài khoản ${currentAccount.slice(0,6)}...${currentAccount.slice(-4)}\n\nChưa được cấp quyền trong hệ thống!`);
