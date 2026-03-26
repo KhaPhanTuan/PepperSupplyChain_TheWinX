@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trace Product</title>
+  <link rel="stylesheet" href="../css/cont.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header-bg"></div>
+
+  <a href="main.html" class="nav home">Home</a>
+  <a href="main.html#supply-chain" class="nav supply">Supply Chain</a>
+  <a href="#" class="nav trace">Trace Product</a>
+  <a href="main.html#about" class="nav about">About</a>
+  <a href="main.html#connect-wallet" class="nav wallet">Connect Wallet</a>
+
+  <div class="logo-bg"></div>
+  <img class="logo-small" src="../../assets/logo-removebg-preview 1.png" alt="">
+  <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="">
+
+  <div class="hero-bg"></div>
+
+  <h1 class="title-main">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
+  <h2 class="title-trace">TRACE YOUR PRODUCT</h2>
+
+  <div class="instruction">Enter Batch ID or scan QR code to view the product's supply chain history.</div>
+
+  <div class="batch-label">Batch ID:</div>
+  <input type="text" class="batch-input">
+
+  <div class="divider-vertical"></div>
+
+  <h3 class="section-title left">TRACE YOUR PRODUCT:</h3>
+  <h3 class="section-title right">INFORMATION:</h3>
+
+  <div class="info-text">Vivamus vehicula sapien sit amet enim finibus vulputate.<br>Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>Cras laoreet sem ac massa tincidunt varius.<br>Pellentesque eleifend risus quis massa vestibulum pulvinar.<br>Mauris id nisi euismod, ullamcorper metus nec, dictum odio.</div>
+
+  <img class="scan-icon" src="../../assets/Scan Stock.png" alt="Scan">
+  <img class="qr-example" src="../../assets/image 2.png" alt="QR">
+
+  <div class="btn-scan-bg"></div>
+  <div class="btn-scan-text">Scan QR</div>
+
+  <div class="footer-bg"></div>
+  <div class="footer-logo-bg"></div>
+
+  <div class="footer-text left">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+    Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+    Proin pharetra augue vel ornare interdum.
+  </div>
+
+  <div class="footer-text right">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+    Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+    Proin pharetra augue vel ornare interdum.
+  </div>
+
+</div>
+
+<script>
+async function traceProduct() {
+  const batchInput = document.querySelector(".batch-input");
+  const infoBox = document.querySelector(".info-text");
+  const batchId = batchInput.value.trim();
+
+  if (!batchId) {
+    alert("⚠️ Vui lòng nhập Batch ID (Ví dụ: 123456)!");
+    return;
+  }
+
+  // Hiệu ứng đang tải
+  infoBox.innerHTML = "⏳ Đang truy xuất dữ liệu từ Blockchain...";
+  infoBox.style.color = "#333";
+
+  try {
+    // Gọi API đã đổi sang cổng 3001
+    const res = await fetch(`http://localhost:3001/api/trace/${batchId}`);
+    const result = await res.json();
+
+    if (!result.success) {
+      infoBox.innerHTML = `<span style="color:red;">❌ ${result.message}</span>`;
+      return;
+    }
+
+    const lot = result.data;
+    const farm = lot.farms || {};
+    const cert = (farm.certifications && farm.certifications[0]) ? farm.certifications[0] : null;
+
+    // Đổ dữ liệu vào giao diện theo format đẹp
+    infoBox.innerHTML = `
+      <div style="line-height: 1.8;">
+        <p><strong>📦 BATCH ID:</strong> <span style="color:#2ecc71;">${lot.chain_batch_id}</span></p>
+        <p><strong>🏡 Farm:</strong> ${farm.farm_name || "N/A"}</p>
+        <p><strong>📍 Location:</strong> ${farm.location || "N/A"}</p>
+        <p><strong>⚖️ Initial Weight:</strong> ${lot.initial_weight} kg</p>
+        <p><strong>📅 Harvest Date:</strong> ${new Date(lot.harvest_date).toLocaleDateString('vi-VN')}</p>
+        <p><strong>📜 Certificate:</strong> ${cert ? cert.cert_type : "None"}</p>
+        <p><strong>🔗 Cert Hash:</strong> <small style="word-break: break-all;">${cert ? cert.cert_hash : "N/A"}</small></p>
+        <p><strong>🚀 Current Status:</strong> <span style="text-transform: uppercase; font-weight: bold; color: #f39c12;">${lot.status}</span></p>
+        <hr>
+        <p><small><i>Lô hàng này đã được xác thực bởi Smart Contract trên mạng Blockchain nội bộ.</i></small></p>
+      </div>
+    `;
+
+  } catch (err) {
+    infoBox.innerHTML = `<span style="color:red;">❌ Lỗi kết nối: ${err.message}</span>`;
+  }
+}
+
+// Gắn sự kiện cho nút Scan
+document.querySelector(".btn-scan-text").addEventListener("click", traceProduct);
+
+// Cho phép nhấn phím Enter để tìm kiếm cho tiện
+document.querySelector(".batch-input").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") traceProduct();
+});
+</script>
+
+</body>
+</html>
