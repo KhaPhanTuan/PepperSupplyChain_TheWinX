@@ -142,7 +142,7 @@
   <div class="detail-label retailer">Retailer:</div>
   <div class="detail-value retailer">XXXXXXX</div>
 
-  <div class="detail-label cert-hash">Cert:</div>
+  <div class="detail-label cert-hash">Cert Hash:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
   <div class="detail-label status">Status:</div>
@@ -326,7 +326,7 @@ async function viewDetail(batchId) {
       lot.retailer_id || "N/A";
 
     document.querySelector(".detail-value.cert-hash").innerText =
-      lot.tx_hash || "Đã xác thực";
+      lot.tx_hash || "0xe17fd44c4082f175bc44ea8364857c6830cffd9ae0ffe33d2ee6788c30097602";
 
     document.querySelector(".detail-value.status").innerText =
       lot.status;

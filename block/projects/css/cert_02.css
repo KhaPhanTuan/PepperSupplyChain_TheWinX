@@ -79,9 +79,6 @@ body {
 .issue-cert     { width: 195px; left: 825px; }
 .connect-wallet { width: 198px; left: 1132px; text-align: right; }
 
-.issue-cert.active {
-  color: #859E6A; /* optional: highlight trang hiện tại */
-}
 
 /* Hero */
 .hero-bg {
@@ -163,7 +160,15 @@ body {
   height: 29px;
   top: 850px;
 }
+.form-label.location {
+  top: 980px;
+}
 
+.location-input {
+  width: 440px;
+  height: 29px;
+  top: 980px;
+}
 /* File upload wrapper */
 .file-upload-wrapper {
   position: absolute;
@@ -172,6 +177,7 @@ body {
   width: 312px;
   height: 29px;
   background: #F4EFE9;
+  color: black;
   border-radius: 5px;
   overflow: hidden;
 }
@@ -212,7 +218,7 @@ body {
   width: 184px;
   height: 60px;
   left: 110px;
-  top: 998px;
+  top: 1040px;
   position: absolute;
   background: #859E6A;
   border-radius: 10px;
@@ -220,7 +226,7 @@ body {
 
 .btn-issue-text {
   left: 123px;
-  top: 1015px;
+  top: 1055px;
   position: absolute;
   color: rgba(244, 239, 233, 0.80);
   font-size: 20px;

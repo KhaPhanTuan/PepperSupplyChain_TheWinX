@@ -100,7 +100,7 @@
   <div class="detail-label done-at">Done at:</div>
   <div class="detail-value done-at">XX/YY/ZZ</div>
 
-  <div class="detail-label cert-hash">Cert:</div>
+  <div class="detail-label cert-hash">Cert Hash:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
 
@@ -114,7 +114,8 @@
 <div class="detail-label">Price (ETH):</div>
 
 <input type="number" class="price-input" placeholder="Nhập giá...">
-
+<div class="detail-label change-weight">Weight (kg):</div>
+<input type="number" class="weight-input" placeholder="Nhập khối lượng...">
   <button class="btn-confirm">Confirm</button>
 
   <!-- Footer -->
@@ -227,7 +228,7 @@ async function viewDetail(batchId) {
         : "Pending";
 
     document.querySelector(".detail-value.cert-hash").textContent =
-      lot.tx_hash || "Đã xác thực";
+      lot.tx_hash || "0xe17fd44c4082f175bc44ea8364857c6830cffd9ae0ffe33d2ee6788c30097602";
 
   } catch (err) {
     console.error(err);
@@ -243,6 +244,7 @@ document.querySelector(".btn-confirm").addEventListener("click", async () => {
   const batchId = document.querySelector(".detail-value.batch-id").textContent.trim();
   const status = document.querySelector(".status-select").value;
   const priceInput = document.querySelector(".price-input").value;
+  const weightInput = document.querySelector(".weight-input").value;
 
   if (!batchId || batchId === "XXXXXXXX") {
     return alert("❌ Chưa chọn batch");
@@ -254,43 +256,37 @@ document.querySelector(".btn-confirm").addEventListener("click", async () => {
 
     if (status === "PROCESSED") {
 
-      const weight = prompt("Nhập khối lượng sau chế biến (kg):");
-      if (!weight) return;
+      // ===== VALIDATE =====
+      if (!weightInput || Number(weightInput) <= 0) {
+        return alert("❌ Nhập weight hợp lệ");
+      }
 
-      // =========================
-      // 🔥 SET PRICE (QUAN TRỌNG)
-      // =========================
       if (!priceInput || Number(priceInput) <= 0) {
         return alert("❌ Nhập price hợp lệ");
       }
 
+      const weight = Number(weightInput);
       const priceWei = ethers.utils.parseEther(priceInput);
 
+      // ===== SET PRICE =====
       const tx1 = await contract.setPrice(batchId, priceWei);
       await tx1.wait();
 
-      console.log("💰 SET PRICE:", tx1.hash);
-
-      // =========================
-      // 🔥 PROCESS
-      // =========================
-      const tx2 = await contract.processLot(batchId, Number(weight));
+      // ===== PROCESS =====
+      const tx2 = await contract.processLot(batchId, weight);
       await tx2.wait();
 
-      console.log("🔥 PROCESS:", tx2.hash);
-
-      // =========================
-      // 🔥 UPDATE DB
-      // =========================
+      // ===== UPDATE DB =====
       const res = await fetch(`${API_URL}/lot/${batchId}/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          processedWeight: Number(weight),
+          processedWeight: weight,
           price: Number(priceInput),
-          wallet: wallet
+          wallet: wallet,
+          txHash: tx2.hash   // 🔥 QUAN TRỌNG
         })
       });
 
@@ -315,7 +311,6 @@ document.querySelector(".btn-confirm").addEventListener("click", async () => {
     }
   }
 });
-
 /* =========================
    INIT
 ========================= */

@@ -256,7 +256,7 @@ body {
 .detail-label.done-at     { top: 1586px; }
 .detail-label.distributor { top: 1660px; }
 .detail-label.cert-hash   { top: 1734px; }
-.detail-label.status      { top: 1808px; }
+.detail-label.status      { top: 1880px; }
 
 .detail-value {
   left: 316px;
@@ -272,8 +272,8 @@ body {
 .detail-value.create-at   { top: 1512px; width: 231px; }
 .detail-value.done-at     { top: 1586px; width: 231px; }
 .detail-value.distributor { top: 1660px; width: 231px; }
-.detail-value.cert-hash    { top: 1734px; width: 231px; }
-.detail-value.status   { top: 1808px; width: 231px; }
+.detail-value.cert-hash {top: 1734px; width: 270px; word-break: break-all; white-space: normal;}
+.detail-value.status   { top: 1880px; width: 231px; }
 
 
 /* Vertical divider in detail */

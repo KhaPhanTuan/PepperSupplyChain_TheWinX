@@ -109,7 +109,7 @@ body {
 }
 
 .hero-desc {
-  width: 872px;
+  width: 1000px;
   left: 296px;
   top: 378px;
   position: absolute;
@@ -131,7 +131,7 @@ body {
 .batch-title       { top: 966px; }
 
 .farmer-info-text {
-  width: 987px;
+  width: 1200px;
   left: 98px;
   top: 776px;
   position: absolute;
@@ -219,25 +219,26 @@ body {
   border-right: 3px solid black;
 }
 
-/* ── Descriptions ─────────────────────────────────────── */
-.desc-left {
-  width: 600px;
-  left: 108px;
-  top: 1576px;
+.desc-left,
+.desc-right {
   position: absolute;
   font-size: 24px;
   font-weight: 500;
-  line-height: 1.45;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* giữ vị trí cũ */
+.desc-left {
+  width: 500px;
+  left: 108px;
+  top: 1576px;
 }
 
 .desc-right {
-  width: 498px;
+  width: 500px;
   left: 750px;
   top: 1570px;
-  position: absolute;
-  font-size: 24px;
-  font-weight: 500;
-  line-height: 1.45;
 }
 
 /* Footer */

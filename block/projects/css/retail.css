@@ -220,7 +220,7 @@ body {
 .detail-value.done-at      { top: 2230px; width: 231px; }
 .detail-value.current-owner{ top: 1934px; left: 836px; width: 500px; }
 .detail-value.retailer     { top: 2008px; left: 836px; width: 231px; }
-.detail-value.cert-hash    { top: 2082px; left: 836px; width: 231px; }
+.detail-value.cert-hash    { top: 2082px; left: 836px; width: 500px;word-break: break-all; white-space: normal; }
 .detail-value.status       { top: 2156px; left: 836px; width: 231px; }
 
 /* Open Cert button */
