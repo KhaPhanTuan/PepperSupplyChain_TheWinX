@@ -22,7 +22,7 @@
       <a href="main.html" class="nav-item home">Home</a>
       <a href="cert_01.html" class="nav-item dashboard">Dash Board</a>
       <a href="cert_02.html" class="nav-item issue-cert">Issue Certificate</a>
-      <a href="#" class="nav-item connect-wallet">Hello Certificer</a>
+      <a href="#" class="nav-item connect-wallet">Hello Certifier</a>
     </nav>
   </header>
 
@@ -36,7 +36,13 @@
 
   <!-- CA Information -->
   <h3 class="section-title ca-info-title">CERTIFICATION AUTHORITY INFORMATION:</h3>
-<p class="ca-info-text">
+<p class="ca-info-text" style="
+  text-align: justify;
+  line-height: 1.6;
+  text-justify: inter-word;
+  hyphens: auto;
+  margin: 0;
+">
   The Certification Authority is responsible for issuing and verifying organic certificates within the supply chain. 
   Each certificate is securely stored on the blockchain, ensuring transparency, authenticity, and tamper-proof validation. 
   This system enables stakeholders to trust the origin and quality of agricultural products through verifiable data.
@@ -98,11 +104,23 @@
   <canvas id="certTypeChart"></canvas>
 </div>
   <!-- Descriptions below table -->
-<p class="desc-left">
+<p class="desc-left" style="
+  text-align: justify;
+  line-height: 1.6;
+  text-justify: inter-word;
+  hyphens: auto;
+  margin: 0;
+">
   This chart shows the number of certificates issued for each farm, helping track certification distribution and identify key producers in the supply chain.
 </p>
 
-<p class="desc-right">
+<p class="desc-right" style="
+  text-align: justify;
+  line-height: 1.6;
+  text-justify: inter-word;
+  hyphens: auto;
+  margin: 0;
+">
   This chart illustrates the proportion of certificate types, providing a quick overview of certification standards applied across the system.
 </p>
 
@@ -173,16 +191,31 @@ async function loadCertificates() {
     });
 
     new Chart(document.getElementById("certByFarmChart"), {
-      type: "bar",
-      data: {
-        labels: Object.keys(farmCount),
-        datasets: [{
-          label: "Certificates per Farm",
-          data: Object.values(farmCount)
-        }]
+  type: "bar",
+  data: {
+    labels: Object.keys(farmCount),
+    datasets: [{
+      label: "Certificates per Farm",
+      data: Object.values(farmCount),
+      backgroundColor: [
+        "#1b2e17",
+        "#859e6a",
+        "#a5695a",
+        "#7d898c",
+        "#f4efe9"
+      ],
+      borderColor: "#1b2e17",
+      borderWidth: 1
+    }]
+  },
+  options: {
+    plugins: {
+      legend: {
+        position: "bottom"
       }
-    });
-
+    }
+  }
+});
     // ===============================
     // 🔥 CHART 2: CERT TYPE
     // ===============================
@@ -194,14 +227,21 @@ async function loadCertificates() {
     });
 
     new Chart(document.getElementById("certTypeChart"), {
-      type: "pie",
-      data: {
-        labels: Object.keys(typeCount),
-        datasets: [{
-          data: Object.values(typeCount)
-        }]
-      }
-    });
+  type: "pie",
+  data: {
+    labels: Object.keys(typeCount),
+    datasets: [{
+      data: Object.values(typeCount),
+      backgroundColor: [
+        "#1b2e17",
+        "#859e6a",
+        "#a5695a",
+        "#7d898c",
+        "#f4efe9"
+      ]
+    }]
+  }
+});
 
   } catch (err) {
     console.error(err);

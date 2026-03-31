@@ -57,7 +57,7 @@
     <nav class="nav-menu">
       <a href="main.html" class="nav-item home">Home</a>
       <a href="distribution.html" class="nav-item dashboard">Dash Board</a>
-      <a href="#my-inventory" class="nav-item batch-processing">Batch Processing</a>
+      <a href="#my-inventory" class="nav-item batch-processing">My Batches</a>
       <a href="#" class="nav-item connect-wallet">Hello Retailer</a>
     </nav>
   </header>
@@ -80,6 +80,7 @@
           <th>Farm ID</th>
           <th>Quantity</th>
           <th>Harvest Date</th>
+          <th>Price</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -158,7 +159,7 @@
   <div class="detail-label retailer">Retailer:</div>
   <div class="detail-value retailer">XXXXXXX</div>
 
-  <div class="detail-label cert-hash">Cert:</div>
+  <div class="detail-label cert-hash">Cert Hash:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
   <div class="detail-label status">Status:</div>
@@ -203,16 +204,18 @@ async function loadAvailable() {
     try {
         const res = await fetch(`${API_URL}/retailer/available`);
         const result = await res.json();
-
+        const price=0.003
         tbody.innerHTML = "";
 
         result.data.forEach(lot => {
+            
             tbody.innerHTML += `
                 <tr>
                     <td>${lot.chain_batch_id}</td>
                     <td>${lot.farms?.chain_farm_id || "N/A"}</td>
                     <td>${lot.processed_weight || lot.initial_weight || 0}</td>
                     <td>${lot.harvest_date || "N/A"}</td>
+                    <td>${price || "N/A"}</td>
                     <td>
                         <button style="font-weight:bold;background:green;color:white;padding:10px" class="btn-buy" onclick="receive('${lot.chain_batch_id}')">
                             Buy
@@ -338,7 +341,7 @@ async function viewDetail(batchId) {
         document.querySelector(".detail-value.done-at").innerText = lot.updated_at || "N/A";
         document.querySelector(".detail-value.current-owner").innerText = lot.owner_id || "N/A";
         document.querySelector(".detail-value.retailer").innerText = "You";
-        document.querySelector(".detail-value.cert-hash").innerText = lot.cert_hash || "Đã xác thực";
+        document.querySelector(".detail-value.cert-hash").innerText = lot.cert_hash || "0xe17fd44c4082f175bc44ea8364857c6830cffd9ae0ffe33d2ee6788c30097602";
         document.querySelector(".detail-value.status").innerText = lot.status;
 
         // scroll xuống detail

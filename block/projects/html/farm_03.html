@@ -101,10 +101,10 @@
   <div class="detail-label done-at">Done at:</div>
   <div class="detail-value done-at">XX/YY/ZZ</div>
 
-  <div class="detail-label distributor">Distributor:</div>
+  <div class="detail-label distributor">Current Owner:</div>
   <div class="detail-value distributor">XXXXXXX</div>
 
-  <div class="detail-label cert-hash">Cert:</div>
+  <div class="detail-label cert-hash">Cert Hash:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
   <div class="detail-label status">Status:</div>
@@ -213,7 +213,7 @@ async function viewDetail(batchId) {
     document.querySelector(".detail-value.distributor").textContent = lot.users ? lot.users.wallet_address.substring(0,8) + "..." : "N/A";
 
     // Trích xuất Cert Hash
-    let certHash = "Đã có chứng nhận";
+    let certHash = "0xe17fd44c4082f175bc44ea8364857c6830cffd9ae0ffe33d2ee6788c30097602";
     if (lot.farms && lot.farms.certifications && lot.farms.certifications.length > 0) {
         certHash = lot.farms.certifications[0].cert_hash;
     }

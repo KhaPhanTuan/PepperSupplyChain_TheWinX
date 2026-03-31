@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <a href="main.html" class="nav-item home">Home</a>
       <a href="cert_01.html" class="nav-item dashboard">Dash Board</a>
       <a href="cert_02.html" class="nav-item issue-cert active">Issue Certificate</a>
-      <a href="#" class="nav-item connect-wallet">Hello Certificer</a>
+      <a href="#" class="nav-item connect-wallet">Hello Certifier</a>
     </nav>
   </header>
 
@@ -62,9 +62,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   <div class="form-label cert-file">Certificate File:</div>
   <div class="file-upload-wrapper">
-    <input type="file" class="form-input cert-file-input" id="cert-file">
-    <button for="cert-file" class="upload-btn">Up load</button>
-  </div>
+  <input type="file" class="form-input cert-file-input" id="cert-file">
+  <span id="file-name" style="position:absolute; left:10px; top:5px; font-size:14px;">
+    No file chosen
+  </span>
+</div>
+
+<button class="upload-btn">Upload</button>
+<div class="form-label location">Location:</div>
+<input type="text" class="form-input location-input" placeholder="Enter location">
 
   <!-- Issue button -->
   <div class="btn-issue-bg"></div>
@@ -143,6 +149,21 @@ document.querySelector(".btn-issue-text").addEventListener("click", async () => 
     } else {
       alert("❌ Lỗi: " + err.message);
     }
+  }
+});
+const fileInput = document.getElementById("cert-file");
+const fileName = document.getElementById("file-name");
+const uploadBtn = document.querySelector(".upload-btn");
+
+uploadBtn.addEventListener("click", () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", () => {
+  if (fileInput.files.length > 0) {
+    fileName.textContent = fileInput.files[0].name;
+  } else {
+    fileName.textContent = "No file chosen";
   }
 });
 </script>

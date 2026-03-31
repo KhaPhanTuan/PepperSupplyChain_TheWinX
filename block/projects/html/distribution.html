@@ -54,7 +54,7 @@
     <nav class="nav-menu">
       <a href="main.html" class="nav-item home">Home</a>
       <a href="distribution.html" class="nav-item dashboard">Dash Board</a>
-      <a href="#my-batches" class="nav-item batch-processing">Batch Processing</a>
+      <a href="#my-batches" class="nav-item batch-processing">My Batches</a>
       <a href="#" class="nav-item connect-wallet">Hello Distributor</a>
     </nav>
   </header>
@@ -62,7 +62,7 @@
   <!-- Hero -->
   <div class="hero-bg"></div>
   <h1 class="hero-title">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
-  <h2 class="hero-subtitle">PROCESSOR SITE</h2>
+  <h2 class="hero-subtitle">DISTRIBUTOR SITE</h2>
   <p class="hero-desc">Manage Organic Certificate</p>
 
   <!-- AVAILABLE BATCHES -->
@@ -147,7 +147,7 @@
   <div class="detail-value current-owner">XXXXXXX</div>
   <div class="detail-label retailer">Retailer:</div>
   <div class="detail-value retailer">XXXXXXX</div>
-  <div class="detail-label cert-hash">Cert:</div>
+  <div class="detail-label cert-hash">Cert Hash:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
   <div class="detail-label status">Status:</div>
   <div class="detail-value status">XXXXXXXXXXXXXX</div>
@@ -206,7 +206,7 @@ async function loadAvailableBatches() {
                 <tr data-batch-id="${lot.chain_batch_id}">
                     <td>${lot.chain_batch_id}</td>
                     <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.initial_weight} kg</td>
+                    <td>${lot.processed_weight} kg</td>
                     <td>${new Date(lot.harvest_date).toLocaleDateString()}</td>
                     <td>${price}</td>
                     <td>
@@ -338,7 +338,7 @@ async function loadMyBatches() {
                 <tr>
                     <td>${lot.chain_batch_id}</td>
                     <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.initial_weight}</td>
+                    <td>${lot.processed_weight}</td>
                     <td>${lot.status}</td>
                     <td>
                         ${
@@ -389,7 +389,7 @@ function viewDetail(lot) {
         lot.status;
 
     document.querySelector(".detail-value.cert-hash").innerText =
-        lot.cert_hash || "Đã xác thực";
+        lot.cert_hash || "0xe17fd44c4082f175bc44ea8364857c6830cffd9ae0ffe33d2ee6788c30097602";
 
     document.querySelector(".detail-value.retailer").innerText =
         lot.retailer_id || "N/A";

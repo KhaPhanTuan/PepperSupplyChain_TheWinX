@@ -206,7 +206,7 @@ body {
 .detail-label.done-at      { top: 2230px; }
 .detail-label.current-owner{ top: 1934px; left: 628px; width: 500px;}
 .detail-label.retailer     { top: 2008px; left: 628px; width: 135px; }
-.detail-label.cert-hash    { top: 2082px; left: 628px; width: 135px; }
+.detail-label.cert-hash    { top: 2082px; left: 628px; width: 300px; }
 .detail-label.status       { top: 2156px; left: 628px; width: 135px; }
 .detail-label.view-cert    { top: 2230px; left: 628px; width: 250px; }
 
@@ -225,7 +225,7 @@ body {
 .detail-value.done-at      { top: 2230px; width: 231px; }
 .detail-value.current-owner{ top: 1934px; left: 836px; width: 500px; }
 .detail-value.retailer     { top: 2008px; left: 836px; width: 231px; }
-.detail-value.cert-hash    { top: 2082px; left: 836px; width: 231px; }
+.detail-value.cert-hash    { top: 2082px; left: 836px; width: 500px;word-break: break-all; white-space: normal; }
 .detail-value.status       { top: 2156px; left: 836px; width: 231px; }
 
 /* Open Cert button */

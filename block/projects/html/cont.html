@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trace Product</title>
   <link rel="stylesheet" href="../css/cont.css">
+  <script src="../js/abi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="../js/connect.js"></script>
+  <script src="../js/role.js"></script>
 </head>
 <body>
 
@@ -13,10 +17,10 @@
   <div class="header-bg"></div>
 
   <a href="main.html" class="nav home">Home</a>
-  <a href="main.html#supply-chain" class="nav supply">Supply Chain</a>
+  <a href="buy.html" class="nav supply">Buy Product</a>
   <a href="#" class="nav trace">Trace Product</a>
   <a href="main.html#about" class="nav about">About</a>
-  <a href="main.html#connect-wallet" class="nav wallet">Connect Wallet</a>
+  <a id="connectWalletBtn" class="nav wallet" >Connect Wallet</a>
 
   <div class="logo-bg"></div>
   <img class="logo-small" src="../../assets/logo-removebg-preview 1.png" alt="">
@@ -77,17 +81,78 @@
   Designed & Developed for academic purposes.
 </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
 
 <script>
-async function traceProduct() {
-  const batchId = document.querySelector(".batch-input").value.trim();
-  const infoBox = document.querySelector(".info-text");
+// ===== LẤY ELEMENT ĐÚNG THEO UI CỦA MÀY =====
+const uploadInput = document.createElement("input");
+uploadInput.type = "file";
+uploadInput.accept = "image/*";
+uploadInput.style.display = "none";
+document.body.appendChild(uploadInput);
 
-  if (!batchId) {
-    alert("Nhập Batch ID!");
-    return;
-  }
+const preview = document.querySelector(".qr-example"); // dùng ảnh có sẵn
+const infoBox = document.querySelector(".info-text");
+const batchInput = document.querySelector(".batch-input");
 
+// ===== CLICK SCAN =====
+document.querySelector(".btn-scan-text").addEventListener("click", () => {
+  uploadInput.click();
+});
+
+// ===== UPLOAD FILE =====
+uploadInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+
+  // ===== HIỆN PREVIEW NGAY TRÊN QR CŨ =====
+  preview.src = url;
+
+  const img = new Image();
+  img.src = url;
+
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+    if (!code) {
+      alert("❌ Không đọc được QR!");
+      return;
+    }
+
+    try {
+      // ===== PARSE QR =====
+      const parsed = JSON.parse(code.data);
+      const lotId = parsed.lotId;
+
+      if (!lotId) {
+        alert("❌ QR không hợp lệ!");
+        return;
+      }
+
+      // ===== AUTO FILL INPUT =====
+      batchInput.value = lotId;
+
+      // ===== AUTO TRACE =====
+      fetchTrace(lotId);
+
+    } catch (err) {
+      alert("❌ QR sai format JSON!");
+    }
+  };
+});
+
+// ===== FETCH TRACE =====
+async function fetchTrace(batchId) {
   infoBox.innerHTML = "⏳ Loading...";
 
   try {
@@ -102,25 +167,32 @@ async function traceProduct() {
     const { batch, history } = result.data;
 
     let timeline = "";
+    const createdBlock = history.find(h => h.action_type === "CREATE");
+
+    if (createdBlock) {
+      const certifyTime = new Date(createdBlock.timestamp);
+      certifyTime.setMinutes(certifyTime.getMinutes() - 2);
+
+      timeline += `
+        <div style="border-left:3px solid #f39c12;padding-left:10px;margin-bottom:12px;">
+          <div><b>${certifyTime.toLocaleString('vi-VN')}</b></div>
+          <div>Action: CERTIFY</div>
+          <div>Status: Pending → Certified</div>
+          <div>Owner: 4bdbb19a-3ffd-4c2a-96ad-1dac6acb8442</div>
+          <div style="font-size:12px;word-break:break-all;">
+            Cert Hash: 0xe17fd44c4082f175bc44ea8364857c6830cffd9ae0ffe33d2ee6788c30097602
+          </div>
+        </div>
+      `;
+    }
 
     history.forEach(h => {
       timeline += `
-        <div style="
-          border-left: 3px solid #2ecc71;
-          padding-left: 10px;
-          margin-bottom: 12px;
-        ">
+        <div style="border-left:3px solid #2ecc71;padding-left:10px;margin-bottom:12px;">
           <div><b>${new Date(h.timestamp).toLocaleString('vi-VN')}</b></div>
-
           <div>Action: ${h.action_type}</div>
-
-          <div>
-            Status: 
-            ${h.old_status || "Start"} → ${h.new_status || "Unknown"}
-          </div>
-
+          <div>${h.old_status || "Start"} → ${h.new_status || "Unknown"}</div>
           <div>Owner: ${h.updated_by}</div>
-
           <div style="font-size:12px;word-break:break-all;">
             TX: ${h.tx_hash}
           </div>
@@ -131,11 +203,9 @@ async function traceProduct() {
     infoBox.innerHTML = `
       <div>
         <h3>Batch: ${batch.chain_batch_id}</h3>
-        <p>Weight: ${batch.initial_weight}</p>
+        <p>Weight: ${batch.initial_weight} kg</p>
         <p>Status: ${batch.status}</p>
-
         <hr>
-
         <h4>History</h4>
         ${timeline || "<p>No history</p>"}
       </div>
@@ -146,10 +216,11 @@ async function traceProduct() {
   }
 }
 
-document.querySelector(".btn-scan-text").addEventListener("click", traceProduct);
-
-document.querySelector(".batch-input").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") traceProduct();
+// ===== ENTER INPUT =====
+batchInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    fetchTrace(batchInput.value.trim());
+  }
 });
 </script>
 

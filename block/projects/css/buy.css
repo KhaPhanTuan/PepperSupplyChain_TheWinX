@@ -9,7 +9,6 @@ body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   min-height: 100vh;
-  overflow-y: auto;
 }
 
 .page-container {
@@ -17,7 +16,6 @@ body {
   min-height: 2582px;
   position: relative;
   background: rgba(27, 46, 23, 0.80);
-  overflow: visible;
   margin: 0 auto;
   color: #F4EFE9;
 }
@@ -60,66 +58,80 @@ body {
   top: 25px;
   left: 316px;
   display: flex;
-  gap: 60px;
+  gap: 40px;
 }
 
-.nav-item {
-  text-decoration: none;
+.nav-link {
   color: #F5F5F5;
   font-size: 24px;
   font-weight: 600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-decoration: none;
   background: #1B2E17;
+  padding: 0 10px;
 }
 
-.home             { width: 101px; }
-.dashboard        { width: 184px; left: 529px; }
-.batch-processing { width: 257px; left: 825px; }
-.connect-wallet   { width: 198px; left: 1132px; text-align: right; }
+.nav-link.connect-wallet {
+  text-align: right;
+  width: 198px;
+}
+
 
 /* Hero */
-.hero-bg {
+/* Hero */
+.hero {
   width: 1440px;
   height: 600px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: linear-gradient(rgba(30,60,40,0.6), rgba(30,60,40,0.6)),
-              url('../../assets/rd.png') center/cover no-repeat;
+  background: 
+    linear-gradient(rgba(30,60,40,0.6), rgba(30,60,40,0.6)),
+    url('../../assets/hero 1.png') center/cover no-repeat;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.hero-title {
-  width: 1343px;
-  left: 48px;
-  top: 189px;
-  position: absolute;
-  text-align: center;
+
+.hero-main-title {
   font-size: 48px;
   font-weight: 700;
+  max-width: 1343px;
+  margin-bottom: 24px;
 }
 
 .hero-subtitle {
-  width: 1026px;
-  left: 207px;
-  top: 292px;
-  position: absolute;
-  text-align: center;
   font-size: 36px;
   font-weight: 700;
+  max-width: 1026px;
+  margin-bottom: 40px;
 }
 
-.hero-desc {
-  width: 872px;
-  left: 296px;
-  top: 378px;
-  position: absolute;
-  text-align: center;
+.btn {
+  width: 300px;
+  height: 60px;
+  background: #859E6A;
+  border-radius: 10px;
+  color: rgba(244, 239, 233, 0.80);
   font-size: 32px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
+.btn-small {
+  width: 251px;
+  height: 60px;
+  font-size: 24px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+}
 /* Section titles */
 .section-title {
   width: 1026px;
@@ -141,7 +153,7 @@ body {
   min-height: 120px;
   max-height: 384px;
   background: #F4EFE9;
-  overflow-y: auto;  
+  overflow-y: auto; 
   overflow-x: hidden;
 }
 
@@ -199,11 +211,11 @@ body {
 .detail-label.quantity     { top: 2082px; }
 .detail-label.create-at    { top: 2156px; }
 .detail-label.done-at      { top: 2230px; }
-.detail-label.current-owner{ top: 1934px; left: 628px; width: 500px;}
-.detail-label.retailer     { top: 2008px; left: 628px; width: 500px; }
+.detail-label.current-owner{ top: 1934px; left: 628px;width: 500px; }
+.detail-label.retailer     { top: 2008px; left: 628px; width: 135px; }
 .detail-label.cert-hash    { top: 2082px; left: 628px; width: 135px; }
 .detail-label.status       { top: 2156px; left: 628px; width: 135px; }
-.detail-label.view-cert    { top: 2230px; left: 628px; width: 500px; }
+.detail-label.view-cert    { top: 2230px; left: 628px; width: 250px; }
 
 .detail-value {
   left: 316px;
@@ -219,9 +231,23 @@ body {
 .detail-value.create-at    { top: 2156px; width: 231px; }
 .detail-value.done-at      { top: 2230px; width: 231px; }
 .detail-value.current-owner{ top: 1934px; left: 836px; width: 500px; }
-.detail-value.retailer     { top: 2008px; left: 836px; width: 231px; }
-.detail-value.cert-hash    { top: 2082px; left: 836px; width: 500px; word-break: break-all; white-space: normal;}
+.detail-value.retailer     { top: 2008px; left: 836px; width: 500px;word-break: break-all; white-space: normal; }
+.detail-value.cert-hash    { top: 2082px; left: 836px; width: 500px;word-break: break-all; white-space: normal; }
 .detail-value.status       { top: 2156px; left: 836px; width: 231px; }
+.qr-box {
+  position: absolute; /* 🔥 QUAN TRỌNG NHẤT */
+  left: 836px;
+  top: 2200px;
+
+  width: 200px;
+  height: 200px;
+
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+
+  z-index: 5;
+}
 
 /* Open Cert button */
 .btn-open-cert {
@@ -239,12 +265,15 @@ body {
   cursor: pointer;
 }
 
+
+
+
 /* Footer */
 .footer-bg {
   width: 1440px;
   height: 250px;
   left: 0;
-  top: 2431px;
+  top: 2500px;
   position: absolute;
   background: #1B2E17;
 }
@@ -253,7 +282,7 @@ body {
   width: 180px;
   height: 180px;
   left: 108px;
-  top: 2466px;
+  top: 2520px;
   position: absolute;
   background: #D9D9D9;
 }
@@ -262,7 +291,7 @@ body {
   width: 178.97px;
   height: 178.97px;
   left: 108px;
-  top: 2470.08px;
+  top: 2525px;
   position: absolute;
 }
 
@@ -275,5 +304,5 @@ body {
   color: #F4EFE9;
 }
 
-.footer-text.left  { left: 410px; top: 2450px; }
-.footer-text.right { left: 940px; top: 2450px; }
+.footer-text.left  { left: 410px; top: 2520px; }
+.footer-text.right { left: 940px; top: 2520px; }

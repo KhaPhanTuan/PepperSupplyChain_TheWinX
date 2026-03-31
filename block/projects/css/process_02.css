@@ -195,9 +195,9 @@ body {
 .detail-label.farm-id       { top: 1380px; }
 .detail-label.batch-id      { top: 1454px; }
 .detail-label.quantity      { top: 1528px; }
-.detail-label.cert-hash     { top: 1602px; left: 113px; width: 135px; }
+.detail-label.cert-hash     { top: 1602px; left: 113px; width: 500px; }
 .detail-label.view-cert     { top: 1680px; left: 113px; width: 250px; }
-.detail-label.change-status { top: 1758px; left: 108px; width: 250px; }
+.detail-label.change-status { top: 1830px; left: 108px; width: 250px; }
 .detail-label.change-price { top: 1680px; left: 108px; width: 250px; }
 
 .detail-value {
@@ -211,14 +211,14 @@ body {
 .detail-value.farm-id   { top: 1380px; width: 171px; }
 .detail-value.batch-id  { top: 1454px; width: 284px; }
 .detail-value.quantity  { top: 1528px; width: 288px; }
-.detail-value.cert-hash { top: 1602px; width: 231px; }
+.detail-value.cert-hash { top: 1602px; width: 500px; }
 
 /* Buttons & inputs */
 .btn-open-cert {
   width: 184px;
   height: 33.42px;
   left: 321px;
-  top: 1676px;
+  top: 1830px;
   position: absolute;
   background: #859E6A;
   border: none;
@@ -233,7 +233,7 @@ body {
   width: 104px;
   height: 33.42px;
   left: 628px;
-  top: 1754px;
+  top: 1830px;
   position: absolute;
   background: #859E6A;
   border: none;
@@ -266,7 +266,7 @@ body {
   width: 288px;
   height: 33.42px;
   left: 316px;
-  top: 1754px;
+  top: 1830px;
   position: absolute;
 
   background: #F4EFE9;
@@ -291,6 +291,26 @@ body {
   outline: 2px solid #6f8a57;
 }
 
+.detail-label.change-weight {
+  top: 1754px;
+  left: 108px;
+}
+
+.weight-input {
+  width: 288px;
+  height: 33.42px;
+  left: 316px;
+  top: 1754px;
+  position: absolute;
+
+  background: #F4EFE9;
+  border-radius: 10px;
+  border: none;
+  padding: 5px 12px;
+
+  font-size: 18px;
+  color: #1B2E17;
+}
 .note-textarea {
   width: 288px;
   height: 178px;

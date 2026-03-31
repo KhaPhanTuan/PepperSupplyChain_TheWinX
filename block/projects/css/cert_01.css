@@ -133,7 +133,7 @@ body {
 .cert-dashboard-title { top: 1009px; }
 
 .ca-info-text {
-  width: 987px;
+  width: 1200px;
   left: 108px;
   top: 822px;
   position: absolute;
@@ -288,27 +288,28 @@ body {
 .chart-container {
   position: absolute;
   width: 520px;
-  height: 420px;
+  height: 480px;
   background: #F4EFE9;
   border-radius: 12px;
-  padding: 16px;
+  padding: 18px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
 /* ===== CHART 1: theo cụm card bên trái ===== */
 .chart-left {
   left: 108px;
-  top: 1150px; /* ngang với cert-card-white */
+  top: 1100px; /* ngang với cert-card-white */
 }
 
 /* ===== CHART 2: theo cụm avatar bên phải ===== */
 .chart-right {
   left: 812px;
-  top: 1150px; /* align với avatar */
+  top: 1100px; /* align với avatar */
 }
 
 /* canvas fill full */
 .chart-container canvas {
-  width: 100% !important;
+  display: block;
+  padding-left: 18px;
   height: 100% !important;
 }

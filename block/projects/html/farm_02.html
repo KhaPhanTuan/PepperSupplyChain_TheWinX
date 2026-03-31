@@ -232,10 +232,6 @@ btn.addEventListener("click", async () => {
     // ===== 5. QR =====
     const qrData = JSON.stringify({
       lotId,
-      farmId,
-      quantity,
-      price,
-      owner
     });
 
     QRCode.toDataURL(qrData, function (err, url) {

@@ -37,7 +37,13 @@
 
   <!-- Farmer Information -->
   <h3 class="section-title farmer-info-title">FARMER INFORMATION:</h3>
-  <p class="farmer-info-text">
+  <p class="farmer-info-text" style="
+  text-align: justify;
+  line-height: 1.6;
+  text-justify: inter-word;
+  hyphens: auto;
+  margin: 0;
+">
   The farm is located in the Central Highlands, specializing in organic pepper cultivation. Each batch is tracked from harvest to delivery to ensure transparency and quality. With stable production and certified processes, the farmer is committed to delivering reliable and traceable agricultural products.
 </p>
 
@@ -172,16 +178,20 @@ async function loadDashboard() {
   const dataQty = batches.map(b => b.initial_weight);
 
   new Chart(document.getElementById("quantityChart"), {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Quantity (kg)",
-        data: dataQty
-      }]
-    }
-  });
-
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{
+      label: "Quantity (kg)",
+      data: dataQty,
+      backgroundColor: labels.map((_, i) =>
+        ["#1b2e17","#859e6a","#a5695a","#7d898c","#f4efe9"][i % 5]
+      ),
+      borderColor: "#1b2e17",
+      borderWidth: 1
+    }]
+  }
+});
   // ===== CHART 2: STATUS =====
   let statusCount = {};
 
@@ -190,15 +200,17 @@ async function loadDashboard() {
   });
 
   new Chart(document.getElementById("statusChart"), {
-    type: "pie",
-    data: {
-      labels: Object.keys(statusCount),
-      datasets: [{
-        data: Object.values(statusCount)
-      }]
-    }
-  });
-  
+  type: "pie",
+  data: {
+    labels: Object.keys(statusCount),
+    datasets: [{
+      data: Object.values(statusCount),
+      backgroundColor: Object.values(statusCount).map((_, i) =>
+        ["#1b2e17","#859e6a","#a5695a","#7d898c","#f4efe9"][i % 5]
+      )
+    }]
+  }
+});
 }
 
 document.addEventListener("DOMContentLoaded", loadDashboard);

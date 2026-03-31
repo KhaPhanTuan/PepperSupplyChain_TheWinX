@@ -122,14 +122,20 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* INFO TEXT (QUAN TRỌNG NHẤT) */
+/* =========================
+   INFO BOX (timeline)
+========================= */
 .info-text {
-  max-height: 400px;      /* chiều cao box */
-  overflow-y: auto;       /* scroll dọc */
-  padding-right: 10px;    /* tránh dính scrollbar */
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+
+  font-size: 15px;
+  line-height: 1.6;
+  color: #E6E6E6;
 }
 
-/* scroll đẹp hơn (optional nhưng nên có) */
+/* scrollbar */
 .info-text::-webkit-scrollbar {
   width: 6px;
 }
@@ -142,38 +148,48 @@ body {
 .info-text::-webkit-scrollbar-track {
   background: transparent;
 }
-/* TIMELINE TEXT */
+
+/* từng block */
 .info-text div {
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 /* TIME */
 .info-text div b {
-  font-size: 16px;
-  color: #dcdcdc;
+  font-size: 15px;
+  color: #A8B3A1; /* xanh xám nhẹ */
+  font-weight: 500;
 }
 
 /* ACTION */
 .info-text div:nth-child(2) {
   font-weight: 600;
+  color: #F4EFE9;
+  font-size: 20px;
 }
 
 /* STATUS */
 .info-text div:nth-child(3) {
-  color: #f1c40f;
+  color: #E8C547; /* vàng dịu (đỡ chói hơn #f1c40f) */
+  font-weight: 500;
 }
 
 /* OWNER */
 .info-text div:nth-child(4) {
-  font-size: 16px;
-  color: #ccc;
+  font-size: 15px;
+  color: #CFCFCF;
 }
 
 /* TX HASH */
 .info-text div:nth-child(5) {
-  font-size: 16px;
-  color: #ccc;
+  font-size: 15px;
+  color: #9AA0A6;
+  word-break: break-all;
 }
+
+
 .title-main {
   position: absolute;
   width: 1343px;

@@ -304,6 +304,10 @@ app.post('/api/lot/:id/process', async (req, res) => {
     const batchId = req.params.id;
     const { processedWeight, wallet, txHash } = req.body;
 
+    if (!processedWeight) {
+      throw new Error("Thiếu weight");
+    }
+
     // ===== USER =====
     const { data: user } = await supabase
       .from('users')
@@ -326,7 +330,7 @@ app.post('/api/lot/:id/process', async (req, res) => {
     await supabase
       .from('batches')
       .update({
-        processed_weight: processedWeight,
+        processed_weight: Number(processedWeight), // 🔥 ép numeric
         status: 'Processed',
         updated_at: new Date()
       })
@@ -339,7 +343,7 @@ app.post('/api/lot/:id/process', async (req, res) => {
       new_status: 'Processed',
       action_type: 'PROCESS',
       updated_by: user.user_id,
-      tx_hash: txHash,
+      tx_hash: txHash || null,
       timestamp: new Date()
     }]);
 
@@ -620,7 +624,109 @@ app.get('/api/available-batches', async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 });
+//Customer
+app.get("/api/customer/available", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("batches")
+      .select("*, farms(chain_farm_id)")
+      .eq("status", "InStock");
 
+    if (error) {
+      console.error(error);
+      return res.json({ success: true, data: [] });
+    }
+
+    res.json({ success: true, data });
+
+  } catch (err) {
+    console.error(err);
+    res.json({ success: true, data: [] });
+  }
+});
+app.post("/api/customer/buy/:id", async (req, res) => {
+  const { id } = req.params;
+  const { wallet, txHash } = req.body;
+
+  try {
+    if (!wallet) throw new Error("Missing wallet");
+
+    // tìm user
+    const { data: user } = await supabase
+      .from("users")
+      .select("user_id")
+      .ilike("wallet_address", wallet.toLowerCase())
+      .maybeSingle();
+
+    if (!user) throw new Error("User not found");
+
+    // tìm batch
+    const { data: batch } = await supabase
+      .from("batches")
+      .select("batch_id, status")
+      .eq("chain_batch_id", id)
+      .maybeSingle();
+
+    if (!batch) throw new Error("Batch not found");
+
+    // update
+    await supabase
+      .from("batches")
+      .update({
+        status: "Sold",
+        owner_id: user.user_id,
+        updated_at: new Date()
+      })
+      .eq("chain_batch_id", id);
+
+    // history
+    await supabase.from("batch_history").insert({
+      batch_id: batch.batch_id,
+      old_status: batch.status,
+      new_status: "Sold",
+      action_type: "CUSTOMER_BUY",
+      updated_by: user.user_id,
+      tx_hash: txHash || "OFFCHAIN",
+      timestamp: new Date()
+    });
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: err.message });
+  }
+});
+app.get("/api/customer/my-batches/:wallet", async (req, res) => {
+  try {
+    const wallet = req.params.wallet?.toLowerCase().trim();
+
+    const { data: user } = await supabase
+      .from("users")
+      .select("user_id")
+      .ilike("wallet_address", wallet)
+      .maybeSingle();
+
+    if (!user) return res.json({ success: true, data: [] });
+
+    const { data, error } = await supabase
+      .from("batches")
+      .select("*, farms(chain_farm_id)")
+      .eq("owner_id", user.user_id)
+      .eq("status", "Sold");
+
+    if (error) {
+      console.error(error);
+      return res.json({ success: true, data: [] });
+    }
+
+    res.json({ success: true, data });
+
+  } catch (err) {
+    console.error(err);
+    res.json({ success: true, data: [] });
+  }
+});
 // ==========================================
 // 8. API DÀNH CHO PROCESSOR (process_01.html)
 // ==========================================
